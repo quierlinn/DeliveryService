@@ -970,6 +970,34 @@
         "build": {
           "buildTransitive/netcoreapp3.1/_._": {}
         }
+      },
+      "DeliveryService.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Sqlite": "8.0.10"
+        },
+        "compile": {
+          "bin/placeholder/DeliveryService.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/DeliveryService.Core.dll": {}
+        }
+      },
+      "DeliveryService.DataAccess/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "DeliveryService.Core": "1.0.0",
+          "Microsoft.EntityFrameworkCore": "8.0.10",
+          "Microsoft.EntityFrameworkCore.Sqlite": "8.0.10"
+        },
+        "compile": {
+          "bin/placeholder/DeliveryService.DataAccess.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/DeliveryService.DataAccess.dll": {}
+        }
       }
     }
   },
@@ -2372,12 +2400,22 @@
         "system.threading.channels.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "DeliveryService.Core/1.0.0": {
+      "type": "project",
+      "path": "../DeliveryService.Core/DeliveryService.Core.csproj",
+      "msbuildProject": "../DeliveryService.Core/DeliveryService.Core.csproj"
+    },
+    "DeliveryService.DataAccess/1.0.0": {
+      "type": "project",
+      "path": "../DeliveryService.DataAccess/DeliveryService.DataAccess.csproj",
+      "msbuildProject": "../DeliveryService.DataAccess/DeliveryService.DataAccess.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net8.0": [
-      "Microsoft.EntityFrameworkCore.Design >= 8.0.10",
-      "Microsoft.EntityFrameworkCore.Sqlite >= 8.0.10"
+      "DeliveryService.DataAccess >= 1.0.0",
+      "Microsoft.EntityFrameworkCore.Design >= 8.0.10"
     ]
   },
   "packageFolders": {
@@ -2386,11 +2424,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\quierlinn\\RiderProjects\\DeliveryService\\DeliveryService.Core\\DeliveryService.Core.csproj",
-      "projectName": "DeliveryService.Core",
-      "projectPath": "C:\\Users\\quierlinn\\RiderProjects\\DeliveryService\\DeliveryService.Core\\DeliveryService.Core.csproj",
+      "projectUniqueName": "C:\\Users\\quierlinn\\RiderProjects\\DeliveryService\\DeliveryService.Application\\DeliveryService.Application.csproj",
+      "projectName": "DeliveryService.Application",
+      "projectPath": "C:\\Users\\quierlinn\\RiderProjects\\DeliveryService\\DeliveryService.Application\\DeliveryService.Application.csproj",
       "packagesPath": "C:\\Users\\quierlinn\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\quierlinn\\RiderProjects\\DeliveryService\\DeliveryService.Core\\obj\\",
+      "outputPath": "C:\\Users\\quierlinn\\RiderProjects\\DeliveryService\\DeliveryService.Application\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\quierlinn\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -2404,7 +2442,11 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\quierlinn\\RiderProjects\\DeliveryService\\DeliveryService.DataAccess\\DeliveryService.DataAccess.csproj": {
+              "projectPath": "C:\\Users\\quierlinn\\RiderProjects\\DeliveryService\\DeliveryService.DataAccess\\DeliveryService.DataAccess.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -2425,10 +2467,6 @@
           "Microsoft.EntityFrameworkCore.Design": {
             "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
             "suppressParent": "All",
-            "target": "Package",
-            "version": "[8.0.10, )"
-          },
-          "Microsoft.EntityFrameworkCore.Sqlite": {
             "target": "Package",
             "version": "[8.0.10, )"
           }
