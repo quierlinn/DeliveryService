@@ -1,13 +1,11 @@
-﻿using DeliveryService.Application;
-
-public class Program
+﻿public class Program
 {
     static void Main(string[] args)
     {
         var arguments = ParseArguments(args);
+        
         string logFilePath = arguments.ContainsKey("_deliveryLog") ? arguments["_deliveryLog"] : "delivery.log";
         string resultFilePath = arguments.ContainsKey("_deliveryOrder") ? arguments["_deliveryOrder"] : "deliveryOrders.txt";
-
 
         var service = new OrderService(logFilePath);
         bool exit = false;
@@ -27,70 +25,15 @@ public class Program
             switch (option)
             {
                 case "1":
-                    Console.Write("Enter weight (kg): ");
-                    if (!double.TryParse(Console.ReadLine(), out double weight))
-                    {
-                        Console.WriteLine("Invalid weight format.");
-                        continue;
-                    }
-
-                    Console.Write("Enter district: ");
-                    string district = Console.ReadLine();
-
-                    Console.Write("Enter delivery time (yyyy-MM-dd HH:mm:ss): ");
-                    if (!DateTime.TryParse(Console.ReadLine(), out DateTime deliveryTime))
-                    {
-                        Console.WriteLine("Invalid date format.");
-                        continue;
-                    }
-
-                    if (service.AddOrder(weight, district, deliveryTime))
-                    {
-                        Console.WriteLine("Order added successfully.");
-                    }
+                    AddOrder(service);
                     break;
 
                 case "2":
-                    Console.Write("Enter district to filter: ");
-                    district = Console.ReadLine();
-
-                    Console.Write("Enter start time (yyyy-MM-dd HH:mm:ss): ");
-                    if (!DateTime.TryParse(Console.ReadLine(), out DateTime from))
-                    {
-                        Console.WriteLine("Invalid date format.");
-                        continue;
-                    }
-
-                    Console.Write("Enter end time (yyyy-MM-dd HH:mm:ss): ");
-                    if (!DateTime.TryParse(Console.ReadLine(), out DateTime to))
-                    {
-                        Console.WriteLine("Invalid date format.");
-                        continue;
-                    }
-
-                    var orders = service.GetOrders(district, from, to);
-                    Console.WriteLine("Filtered Orders:");
-                    foreach (var order in orders)
-                    {
-                        Console.WriteLine($"Order {order.OrderNumber} - Weight: {order.Weight} kg - Delivery Time: {order.DeliveryTime}");
-                    }
+                    FilterOrders(service);
                     break;
 
                 case "3":
-                    Console.Write("Enter district to filter: ");
-                    district = Console.ReadLine();
-
-                    Console.Write("Enter start time for first delivery (yyyy-MM-dd HH:mm:ss): ");
-                    if (!DateTime.TryParse(Console.ReadLine(), out DateTime firstDelivery))
-                    {
-                        Console.WriteLine("Invalid date format.");
-                        continue;
-                    }
-
-                    DateTime thirtyMinutesLater = firstDelivery.AddMinutes(30);
-                    var filteredOrders = service.GetOrders(district, firstDelivery, thirtyMinutesLater);
-                    service.SaveFilteredOrders(filteredOrders, resultFilePath);
-                    Console.WriteLine($"Filtered orders saved to {resultFilePath}");
+                    SaveFilteredOrders(service, resultFilePath);
                     break;
 
                 case "4":
@@ -105,8 +48,80 @@ public class Program
             Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
         }
-        
     }
+
+    static void AddOrder(OrderService service)
+    {
+        Console.Write("Enter weight (kg): ");
+        if (!double.TryParse(Console.ReadLine(), out double weight) || weight <= 0)
+        {
+            Console.WriteLine("Invalid weight format. Please enter a positive number.");
+            return;
+        }
+
+        Console.Write("Enter district: ");
+        string district = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(district))
+        {
+            Console.WriteLine("District cannot be empty.");
+            return;
+        }
+
+        Console.Write("Enter delivery time (yyyy-MM-dd HH:mm:ss): ");
+        if (!DateTime.TryParse(Console.ReadLine(), out DateTime deliveryTime))
+        {
+            Console.WriteLine("Invalid date format.");
+            return;
+        }
+
+        service.AddOrder(weight, district, deliveryTime);
+    }
+
+    static void FilterOrders(OrderService service)
+    {
+        Console.Write("Enter district to filter: ");
+        string district = Console.ReadLine();
+        
+        Console.Write("Enter start time (yyyy-MM-dd HH:mm:ss): ");
+        if (!DateTime.TryParse(Console.ReadLine(), out DateTime from))
+        {
+            Console.WriteLine("Invalid date format.");
+            return;
+        }
+
+        Console.Write("Enter end time (yyyy-MM-dd HH:mm:ss): ");
+        if (!DateTime.TryParse(Console.ReadLine(), out DateTime to))
+        {
+            Console.WriteLine("Invalid date format.");
+            return;
+        }
+
+        var orders = service.GetOrders(district, from, to);
+        Console.WriteLine("Filtered Orders:");
+        foreach (var order in orders)
+        {
+            Console.WriteLine($"Order {order.OrderNumber} - Weight: {order.Weight} kg - Delivery Time: {order.DeliveryTime}");
+        }
+    }
+
+    static void SaveFilteredOrders(OrderService service, string resultFilePath)
+    {
+        Console.Write("Enter district to filter: ");
+        string district = Console.ReadLine();
+
+        Console.Write("Enter start time for first delivery (yyyy-MM-dd HH:mm:ss): ");
+        if (!DateTime.TryParse(Console.ReadLine(), out DateTime firstDelivery))
+        {
+            Console.WriteLine("Invalid date format.");
+            return;
+        }
+
+        DateTime thirtyMinutesLater = firstDelivery.AddMinutes(30);
+        var filteredOrders = service.GetOrders(district, firstDelivery, thirtyMinutesLater);
+        service.SaveFilteredOrders(filteredOrders, resultFilePath);
+        Console.WriteLine($"Filtered orders saved to {resultFilePath}");
+    }
+
     static Dictionary<string, string> ParseArguments(string[] args)
     {
         var arguments = new Dictionary<string, string>();

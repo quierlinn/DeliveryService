@@ -1,8 +1,6 @@
 ﻿using DeliveryService.Core;
 using DeliveryService.DataAccess;
 
-namespace DeliveryService.Application;
-
 public class OrderService
 {
     private readonly DeliveryDbContext _context;
@@ -16,8 +14,17 @@ public class OrderService
 
     public void Log(string message)
     {
-        using var writer = new StreamWriter(_logFilePath, append: true);
-        writer.WriteLine($"{DateTime.Now}: {message}");
+        try
+        {
+            using (var writer = new StreamWriter(_logFilePath, append: true))
+            {
+                writer.WriteLine($"{DateTime.Now}: {message}");
+            }
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine("Error writing to log file: " + ex.Message);
+        }
     }
 
     public bool AddOrder(double weight, string district, DateTime deliveryTime)
@@ -36,29 +43,56 @@ public class OrderService
             return false;
         }
 
-        var order = new Order { Weight = weight, District = district, DeliveryTime = deliveryTime };
-        _context.Orders.Add(order);
-        _context.SaveChanges();
-        Log($"Order {order.OrderNumber} added.");
-        return true;
+        try
+        {
+            var order = new Order { Weight = weight, District = district, DeliveryTime = deliveryTime };
+            _context.Orders.Add(order);
+            _context.SaveChanges();
+            Log($"Order {order.OrderNumber} added.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Log("Error adding order: " + ex.Message);
+            Console.WriteLine("An error occurred while adding the order.");
+            return false;
+        }
     }
 
     public List<Order> GetOrders(string district, DateTime from, DateTime to)
     {
-        Log($"Filtering orders for district: {district} between {from} and {to}");
-        return _context.Orders
-            .Where(o => o.District == district && o.DeliveryTime >= from && o.DeliveryTime <= to)
-            .ToList();
+        try
+        {
+            Log($"Filtering orders for district: {district} between {from} and {to}");
+            return _context.Orders
+                .Where(o => o.District == district && o.DeliveryTime >= from && o.DeliveryTime <= to)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Log("Error retrieving orders: " + ex.Message);
+            Console.WriteLine("An error occurred while retrieving orders.");
+            return new List<Order>();
+        }
     }
+
     public void SaveFilteredOrders(List<Order> orders, string resultFilePath)
     {
-        using (var writer = new StreamWriter(resultFilePath))
+        try
         {
-            foreach (var order in orders)
+            using (var writer = new StreamWriter(resultFilePath))
             {
-                writer.WriteLine($"Order {order.OrderNumber} - Weight: {order.Weight} kg - Delivery Time: {order.DeliveryTime}");
+                foreach (var order in orders)
+                {
+                    writer.WriteLine($"Order {order.OrderNumber} - Weight: {order.Weight} kg - Delivery Time: {order.DeliveryTime}");
+                }
             }
+            Log("Filtered orders saved to file.");
         }
-        Log("Filtered orders saved to file.");
+        catch (IOException ex)
+        {
+            Log("Error saving filtered orders: " + ex.Message);
+            Console.WriteLine("Error saving filtered orders to file.");
+        }
     }
 }
