@@ -10,12 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("DeliveryService.DataAccess")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("DeliveryService.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5549ee0a8db119afd149c16e21e812584f41600e")]
-[assembly: System.Reflection.AssemblyProductAttribute("DeliveryService.DataAccess")]
-[assembly: System.Reflection.AssemblyTitleAttribute("DeliveryService.DataAccess")]
+[assembly: System.Reflection.AssemblyProductAttribute("DeliveryService.Application")]
+[assembly: System.Reflection.AssemblyTitleAttribute("DeliveryService.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 
 // Создано классом WriteCodeFragment MSBuild.
