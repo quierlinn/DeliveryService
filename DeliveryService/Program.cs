@@ -33,7 +33,7 @@
                     break;
 
                 case "3":
-                    SaveFilteredOrders(service, resultFilePath);
+                    SaveFilteredOrders(service);
                     break;
 
                 case "4":
@@ -95,8 +95,7 @@
             Console.WriteLine("Invalid date format.");
             return;
         }
-
-        var orders = service.GetOrders(district, from, to);
+        var orders = service.GetFilteredOrders(district, from, to);
         Console.WriteLine("Filtered Orders:");
         foreach (var order in orders)
         {
@@ -104,7 +103,7 @@
         }
     }
 
-    static void SaveFilteredOrders(OrderService service, string resultFilePath)
+    static void SaveFilteredOrders(OrderService service)
     {
         Console.Write("Enter district to filter: ");
         string district = Console.ReadLine();
@@ -116,10 +115,8 @@
             return;
         }
 
-        DateTime thirtyMinutesLater = firstDelivery.AddMinutes(30);
-        var filteredOrders = service.GetOrders(district, firstDelivery, thirtyMinutesLater);
-        service.SaveFilteredOrders(filteredOrders, resultFilePath);
-        Console.WriteLine($"Filtered orders saved to {resultFilePath}");
+        service.FilterAndSaveOrders(district, firstDelivery);
+        Console.WriteLine("Filtered orders saved to the database.");
     }
 
     static Dictionary<string, string> ParseArguments(string[] args)

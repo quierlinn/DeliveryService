@@ -29,17 +29,9 @@ public class OrderService
 
     public bool AddOrder(double weight, string district, DateTime deliveryTime)
     {
-        if (weight <= 0)
+        if (weight <= 0 || string.IsNullOrEmpty(district))
         {
-            Log("Invalid weight specified.");
-            Console.WriteLine("Weight must be greater than zero.");
-            return false;
-        }
-        
-        if (string.IsNullOrEmpty(district))
-        {
-            Log("Invalid district specified.");
-            Console.WriteLine("District cannot be empty.");
+            Log("Invalid order data.");
             return false;
         }
 
@@ -54,16 +46,15 @@ public class OrderService
         catch (Exception ex)
         {
             Log("Error adding order: " + ex.Message);
-            Console.WriteLine("An error occurred while adding the order.");
             return false;
         }
     }
 
-    public List<Order> GetOrders(string district, DateTime from, DateTime to)
+    public List<Order> GetFilteredOrders(string district, DateTime from, DateTime to)
     {
         try
         {
-            Log($"Filtering orders for district: {district} between {from} and {to}");
+            Log($"Retrieving orders for district {district} between {from} and {to}");
             return _context.Orders
                 .Where(o => o.District == district && o.DeliveryTime >= from && o.DeliveryTime <= to)
                 .ToList();
@@ -76,23 +67,33 @@ public class OrderService
         }
     }
 
-    public void SaveFilteredOrders(List<Order> orders, string resultFilePath)
+    public void FilterAndSaveOrders(string district, DateTime firstDeliveryTime)
     {
+        DateTime thirtyMinutesLater = firstDeliveryTime.AddMinutes(30);
+        
         try
         {
-            using (var writer = new StreamWriter(resultFilePath))
+            var filteredOrders = GetFilteredOrders(district, firstDeliveryTime, thirtyMinutesLater);
+
+            foreach (var order in filteredOrders)
             {
-                foreach (var order in orders)
+                var filteredOrder = new FilteredOrder
                 {
-                    writer.WriteLine($"Order {order.OrderNumber} - Weight: {order.Weight} kg - Delivery Time: {order.DeliveryTime}");
-                }
+                    OrderNumber = order.OrderNumber,
+                    Weight = order.Weight,
+                    District = order.District,
+                    DeliveryTime = order.DeliveryTime
+                };
+                
+                _context.FilteredOrders.Add(filteredOrder);
             }
-            Log("Filtered orders saved to file.");
+            _context.SaveChanges();
+            Log($"Filtered {filteredOrders.Count} orders for district {district} saved to FilteredOrders table.");
         }
-        catch (IOException ex)
+        catch (Exception ex)
         {
             Log("Error saving filtered orders: " + ex.Message);
-            Console.WriteLine("Error saving filtered orders to file.");
+            Console.WriteLine("An error occurred while saving filtered orders.");
         }
     }
 }
