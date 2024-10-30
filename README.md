@@ -19,7 +19,7 @@
   _deliveryLog — путь к файлу логов, где будут сохраняться записи о действиях программы.
   _deliveryOrder — путь к файлу для сохранения отфильтрованных заказов.
 ## Пример команды запуска:
-  sdotnet run -- _deliveryLog="C:\path\to\log.txt" _deliveryOrder="C:\path\to\filtered_orders.txt"
+  dotnet run -- _deliveryLog="C:\path\to\log.txt" _deliveryOrder="C:\path\to\filtered_orders.txt"
 ## Основные операции включают:
 * Добавление заказа: Запросит данные о заказе, включая вес, район и время доставки.
 * Фильтрация заказов: Позволяет отфильтровать заказы для конкретного района и временного диапазона.
